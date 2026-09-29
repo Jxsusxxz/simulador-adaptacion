@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Simulador de Capacidad de Adaptación</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef6f0;
+            color: #1f2937;
+        }
+
+        header {
+            background: #166534;
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        header p {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 25px auto;
+            padding: 0 15px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #166534;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .control {
+            background: #f0fdf4;
+            padding: 18px;
+            border-radius: 12px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .valor {
+            font-size: 22px;
+            font-weight: bold;
+            color: #15803d;
+        }
+
+        .formula {
+            background: #f3f4f6;
+            padding: 18px;
+            border-radius: 10px;
+            font-family: monospace;
+            font-size: 16px;
+            overflow-x: auto;
+        }
+
+        .resultados {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .resultado {
+            background: #f0fdf4;
+            padding: 20px;
+            text-align: center;
+            border-radius: 12px;
+        }
+
+        .resultado h3 {
+            margin: 0;
+            color: #166534;
+        }
+
+        .numero {
+            font-size: 32px;
+            font-weight: bold;
+            color: #15803d;
+            margin-top: 8px;
+        }
+
+        canvas {
+            width: 100%;
+            max-height: 400px;
+        }
+
+        .tabla-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th {
+            background: #166534;
+            color: white;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background: #f0fdf4;
+        }
+
+        .interpretacion {
+            background: #ecfdf5;
+            border-left: 5px solid #16a34a;
+            padding: 18px;
+            border-radius: 8px;
+            line-height: 1.6;
+        }
+
+        .boton {
+            background: #166534;
+            color: white;
+            border: none;
+            padding: 13px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .boton:hover {
+            background: #14532d;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        @media (max-width: 700px) {
+            .controls,
+            .resultados {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>🌱 Simulador de Capacidad de Adaptación</h1>
+    <p>Guardianes del Clima · Grupo 2</p>
+</header>
+
+<div class="container">
+
+    <!-- INTRODUCCIÓN -->
+    <div class="card">
+        <h2>🔬 Nuestro modelo científico</h2>
+
+        <p>
+            La capacidad de adaptación aumenta cuando un organismo logra
+            responder de manera efectiva a cambios en las condiciones del ambiente.
+        </p>
+
+        <p>
+            En este simulador podemos observar cómo los cambios de temperatura,
+            agua y alimento pueden afectar la adaptación y la población sobreviviente.
+        </p>
+    </div>
+
+
+    <!-- VARIABLES -->
+    <div class="card">
+
+        <h2>🎛️ Variables de entrada</h2>
+
+        <div class="controls">
+
+            <div class="control">
+
+                <label>
+                    Temperatura inicial
+                </label>
+
+                <input
+                    type="range"
+                    id="temperatura"
+                    min="5"
+                    max="45"
+                    value="25"
+                >
+
+                <div class="valor">
+                    <span id="valorTemperatura">25</span> °C
+                </div>
+
+            </div>
+
+
+            <div class="control">
+
+                <label>
+                    Temperatura óptima
+                </label>
+
+                <input
+                    type="range"
+                    id="temperaturaOptima"
+                    min="5"
+                    max="45"
+                    value="25"
+                >
+
+                <div class="valor">
+                    <span id="valorOptima">25</span> °C
+                </div>
+
+            </div>
+
+
+            <div class="control">
+
+                <label>
+                    Disponibilidad de agua
+                </label>
+
+                <input
+                    type="range"
+                    id="agua"
+                    min="0"
+                    max="100"
+                    value="80"
+                >
+
+                <div class="valor">
+                    <span id="valorAgua">80</span> %
+                </div>
+
+            </div>
+
+
+            <div class="control">
+
+                <label>
+                    Disponibilidad de alimento
+                </label>
+
+                <input
+                    type="range"
+                    id="alimento"
+                    min="0"
+                    max="100"
+                    value="80"
+                >
+
+                <div class="valor">
+                    <span id="valorAlimento">80</span> %
+                </div>
+
+            </div>
+
+
+            <div class="control">
+
+                <label>
+                    Población inicial
+                </label>
+
+                <input
+                    type="range"
+                    id="poblacion"
+                    min="100"
+                    max="5000"
+                    step="100"
+                    value="1000"
+                >
+
+                <div class="valor">
+                    <span id="valorPoblacion">1000</span>
+                </div>
+
+            </div>
+
+
+            <div class="control">
+
+                <label>
+                    Cambio anual de temperatura
+                </label>
+
+                <input
+                    type="range"
+                    id="cambioTemperatura"
+                    min="-3"
+                    max="3"
+                    step="0.5"
+                    value="1"
+                >
+
+                <div class="valor">
+                    <span id="valorCambio">+1</span> °C
+                </div>
+
+            </div>
+
+        </div>
+
+        <button class="boton" onclick="simular()">
+            🔄 Ejecutar simulación
+        </button>
+
+    </div>
+
+
+    <!-- FORMULAS -->
+
+    <div class="card">
+
+        <h2>📐 Representación matemática</h2>
+
+        <div class="formula">
+
+            A = (1 − |T − To| / To) × 100
+
+            <br><br>
+
+            Ps = Pi × (1 + A/100) × (Ag + Al)/2
+
+        </div>
+
+        <p>
+            <strong>A</strong> = porcentaje de adaptación
+        </p>
+
+        <p>
+            <strong>T</strong> = temperatura del ambiente
+        </p>
+
+        <p>
+            <strong>To</strong> = temperatura óptima
+        </p>
+
+        <p>
+            <strong>Ps</strong> = población sobreviviente
+        </p>
+
+        <p>
+            <strong>Pi</strong> = población inicial
+        </p>
+
+        <p>
+            <strong>Ag</strong> = disponibilidad de agua
+        </p>
+
+        <p>
+            <strong>Al</strong> = disponibilidad de alimento
+        </p>
+
+    </div>
+
+
+    <!-- RESULTADOS -->
+
+    <div class="card">
+
+        <h2>📊 Resultados del año 10</h2>
+
+        <div class="resultados">
+
+            <div class="resultado">
+
+                <h3>Porcentaje de adaptación</h3>
+
+                <div
+                    class="numero"
+                    id="adaptacionFinal">
+                    100%
+                </div>
+
+            </div>
+
+
+            <div class="resultado">
+
+                <h3>Población sobreviviente</h3>
+
+                <div
+                    class="numero"
+                    id="poblacionFinal">
+                    1000
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- GRAFICA ADAPTACIÓN -->
+
+    <div class="card">
+
+        <h2>📈 Gráfica de adaptación</h2>
+
+        <canvas id="graficaAdaptacion"></canvas>
+
+    </div>
+
+
+    <!-- GRAFICA POBLACIÓN -->
+
+    <div class="card">
+
+        <h2>👥 Gráfica de población sobreviviente</h2>
+
+        <canvas id="graficaPoblacion"></canvas>
+
+    </div>
+
+
+    <!-- TABLA -->
+
+    <div class="card">
+
+        <h2>📋 Resultados de los 10 años</h2>
+
+        <div class="tabla-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Año</th>
+                        <th>Temperatura</th>
+                        <th>Agua</th>
+                        <th>Alimento</th>
+                        <th>Adaptación</th>
+                        <th>Población</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="tablaResultados"></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- INTERPRETACIÓN -->
+
+    <div class="card">
+
+        <h2>🔎 Interpretación</h2>
+
+        <div
+            class="interpretacion"
+            id="interpretacion">
+
+            Ajusta las variables y ejecuta la simulación para observar
+            cómo responde la población a los cambios ambientales.
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<footer>
+
+    Proyecto: Guardianes del Clima · Capacidad de adaptación
+
+</footer>
+
+
+<script>
+
+let graficaAdaptacion;
+let graficaPoblacion;
+
+
+/* Actualizar valores */
+
+document.getElementById("temperatura").addEventListener("input", function() {
+
+    document.getElementById("valorTemperatura").textContent = this.value;
+
+});
+
+
+document.getElementById("temperaturaOptima").addEventListener("input", function() {
+
+    document.getElementById("valorOptima").textContent = this.value;
+
+});
+
+
+document.getElementById("agua").addEventListener("input", function() {
+
+    document.getElementById("valorAgua").textContent = this.value;
+
+});
+
+
+document.getElementById("alimento").addEventListener("input", function() {
+
+    document.getElementById("valorAlimento").textContent = this.value;
+
+});
+
+
+document.getElementById("poblacion").addEventListener("input", function() {
+
+    document.getElementById("valorPoblacion").textContent = this.value;
+
+});
+
+
+document.getElementById("cambioTemperatura").addEventListener("input", function() {
+
+    let valor = Number(this.value);
+
+    document.getElementById("valorCambio").textContent =
+        valor > 0 ? "+" + valor : valor;
+
+});
+
+
+/* SIMULACIÓN */
+
+function simular() {
+
+    const temperaturaInicial =
+        Number(document.getElementById("temperatura").value);
+
+    const temperaturaOptima =
+        Number(document.getElementById("temperaturaOptima").value);
+
+    const agua =
+        Number(document.getElementById("agua").value) / 100;
+
+    const alimento =
+        Number(document.getElementById("alimento").value) / 100;
+
+    const poblacionInicial =
+        Number(document.getElementById("poblacion").value);
+
+    const cambioTemperatura =
+        Number(document.getElementById("cambioTemperatura").value);
+
+
+    let poblacion = poblacionInicial;
+
+    let datosAdaptacion = [];
+
+    let datosPoblacion = [];
+
+    let tabla = "";
+
+
+    /* 10 años */
+
+    for (let año = 0; año <= 10; año++) {
+
+        let temperatura =
+            temperaturaInicial +
+            (cambioTemperatura * año);
+
+
+        /*
+        Fórmula:
+
+        A = (1 − |T − To| / To) × 100
+        */
+
+        let adaptacion =
+            (1 -
+            Math.abs(temperatura - temperaturaOptima)
+            / temperaturaOptima) * 100;
+
+
+        /*
+        Evitar valores negativos
+        */
+
+        adaptacion =
+            Math.max(0, Math.min(100, adaptacion));
+
+
+        /*
+        Fórmula:
+
+        Ps = Pi × (1 + A/100) × (Ag + Al)/2
+        */
+
+        if (año === 0) {
+
+            poblacion = poblacionInicial;
+
+        } else {
+
+            poblacion =
+                poblacion *
+                (1 + adaptacion / 100) *
+                ((agua + alimento) / 2);
+
+        }
+
+
+        poblacion = Math.max(0, poblacion);
+
+
+        datosAdaptacion.push(adaptacion);
+
+        datosPoblacion.push(poblacion);
+
+
+        tabla += `
+
+            <tr>
+
+                <td>${año}</td>
+
+                <td>${temperatura.toFixed(1)} °C</td>
+
+                <td>${(agua * 100).toFixed(0)}%</td>
+
+                <td>${(alimento * 100).toFixed(0)}%</td>
+
+                <td>${adaptacion.toFixed(1)}%</td>
+
+                <td>${Math.round(poblacion)}</td>
+
+            </tr>
+
+        `;
+
+    }
+
+
+    document.getElementById("tablaResultados").innerHTML = tabla;
+
+
+    /* Resultados finales */
+
+    document.getElementById("adaptacionFinal").textContent =
+        datosAdaptacion[10].toFixed(1) + "%";
+
+
+    document.getElementById("poblacionFinal").textContent =
+        Math.round(datosPoblacion[10]);
+
+
+    /* Gráficas */
+
+    dibujarGrafica(
+        "graficaAdaptacion",
+        datosAdaptacion,
+        100,
+        "Porcentaje de adaptación",
+        "%"
+
+    );
+
+
+    let maxPoblacion =
+        Math.max(...datosPoblacion);
+
+    dibujarGrafica(
+        "graficaPoblacion",
+        datosPoblacion,
+        maxPoblacion,
+        "Población",
+        ""
+
+    );
+
+
+    /* Interpretación */
+
+    let adaptacionFinal =
+        datosAdaptacion[10];
+
+
+    let texto;
+
+
+    if (adaptacionFinal >= 75) {
+
+        texto =
+            "La adaptación se mantiene alta en este escenario. " +
+            "Las condiciones ambientales permanecen relativamente " +
+            "cercanas a la temperatura óptima del organismo.";
+
+    }
+
+    else if (adaptacionFinal >= 40) {
+
+        texto =
+            "La adaptación disminuye de manera moderada. " +
+            "El cambio de temperatura empieza a alejar al organismo " +
+            "de sus condiciones óptimas.";
+
+    }
+
+    else {
+
+        texto =
+            "La adaptación disminuye considerablemente porque " +
+            "la temperatura se aleja de la condición óptima. " +
+            "Esto representa un escenario ambiental más difícil " +
+            "para el organismo.";
+
+    }
+
+
+    document.getElementById("interpretacion").textContent =
+        texto +
+        " La disponibilidad de agua y alimento también influye " +
+        "en la población sobreviviente.";
+
+}
+
+
+/* DIBUJAR GRÁFICAS */
+
+function dibujarGrafica(
+    canvasId,
+    datos,
+    maximo,
+    titulo,
+    unidad
+) {
+
+    const canvas =
+        document.getElementById(canvasId);
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    const ancho =
+        canvas.width = canvas.offsetWidth * 2;
+
+    const alto =
+        canvas.height = 350;
+
+
+    ctx.clearRect(
+        0,
+        0,
+        ancho,
+        alto
+    );
+
+
+    /* Escala */
+
+    const margenIzquierdo = 60;
+
+    const margenDerecho = 20;
+
+    const margenSuperior = 30;
+
+    const margenInferior = 45;
+
+
+    const anchoGrafica =
+        ancho -
+        margenIzquierdo -
+        margenDerecho;
+
+
+    const altoGrafica =
+        alto -
+        margenSuperior -
+        margenInferior;
+
+
+    /* Fondo */
+
+    ctx.fillStyle = "#ffffff";
+
+    ctx.fillRect(
+        0,
+        0,
+        ancho,
+        alto
+    );
+
+
+    /* Líneas horizontales */
+
+    ctx.strokeStyle = "#d1d5db";
+
+    ctx.lineWidth = 2;
+
+
+    for (let i = 0; i <= 5; i++) {
+
+        const y =
+            margenSuperior +
+            (altoGrafica / 5) * i;
+
+
+        ctx.beginPath();
+
+        ctx.moveTo(
+            margenIzquierdo,
+            y
+        );
+
+        ctx.lineTo(
+            ancho - margenDerecho,
+            y
+        );
+
+        ctx.stroke();
+
+
+        const valor =
+            maximo -
+            (maximo / 5) * i;
+
+
+        ctx.fillStyle = "#475569";
+
+        ctx.font = "14px Arial";
+
+        ctx.textAlign = "right";
+
+
+        ctx.fillText(
+            valor.toFixed(0),
+            margenIzquierdo - 8,
+            y + 5
+        );
+
+    }
+
+
+    /* Línea de la gráfica */
+
+    ctx.strokeStyle = "#16a34a";
+
+    ctx.lineWidth = 5;
+
+    ctx.beginPath();
+
+
+    datos.forEach(
+        (valor, indice) => {
+
+            const x =
+                margenIzquierdo +
+                (indice /
+                (datos.length - 1)) *
+                anchoGrafica;
+
+
+            const y =
+                margenSuperior +
+                altoGrafica -
+                (valor / maximo) *
+                altoGrafica;
+
+
+            if (indice === 0) {
+
+                ctx.moveTo(x, y);
+
+            }
+
+            else {
+
+                ctx.lineTo(x, y);
+
+            }
+
+        }
+    );
+
+
+    ctx.stroke();
+
+
+    /* Puntos */
+
+    datos.forEach(
+        (valor, indice) => {
+
+            const x =
+                margenIzquierdo +
+                (indice /
+                (datos.length - 1)) *
+                anchoGrafica;
+
+
+            const y =
+                margenSuperior +
+                altoGrafica -
+                (valor / maximo) *
+                altoGrafica;
+
+
+            ctx.fillStyle = "#166534";
+
+            ctx.beginPath();
+
+            ctx.arc(
+                x,
+                y,
+                6,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.fill();
+
+
+            /* Año */
+
+            ctx.fillStyle = "#475569";
+
+            ctx.font = "14px Arial";
+
+            ctx.textAlign = "center";
+
+
+            ctx.fillText(
+                indice,
+                x,
+                alto - 15
+            );
+
+        }
+    );
+
+
+    /* Título */
+
+    ctx.fillStyle = "#166534";
+
+    ctx.font = "bold 18px Arial";
+
+    ctx.textAlign = "center";
+
+
+    ctx.fillText(
+        titulo,
+        ancho / 2,
+        20
+    );
+
+
+}
+
+
+/* Ejecutar automáticamente */
+
+simular();
+
+</script>
+
+</body>
+</html>
